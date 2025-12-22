@@ -36,7 +36,6 @@ bool initialize(hash* h, unsigned int max_size)
 	}
 
 	h->max_size = max_size;
-
 	return true;
 }
 
