@@ -14,6 +14,8 @@ static unsigned int get_hash(const hash* h, unsigned int key)
 	if (h == NULL) return ~0;
 	if (key == ~0) return ~0;
 
+	// ToDo: ハッシュ関数としてhash_funcを使った
+	// オープンアドレス法によるハッシュ値を求める
 	unsigned int base = hash_func(key, h->max_size);
 
 	for (unsigned int i = 0; i < h->max_size; i++) {
@@ -27,7 +29,7 @@ static unsigned int get_hash(const hash* h, unsigned int key)
 	return ~0;
 }
 
-// ハッシュの初期化 (max_size は ~0 未満)
+// ハッシュの初期化(max_sizeは~0未満)
 bool initialize(hash* h, unsigned int max_size)
 {
 	if (h == NULL) return false;
@@ -36,7 +38,7 @@ bool initialize(hash* h, unsigned int max_size)
 	if (h->nodes != NULL) finalize(h);
 
 	h->nodes = (hash_node*)malloc(max_size * sizeof(hash_node));
-	if (h->nodes == NULL) return false;
+	if (NULL == h->nodes) return false;
 
 	for (unsigned int i = 0; i < max_size; i++) {
 		h->nodes[i].key = ~0;
@@ -44,6 +46,7 @@ bool initialize(hash* h, unsigned int max_size)
 	}
 
 	h->max_size = max_size;
+
 	return true;
 }
 
@@ -57,33 +60,32 @@ void finalize(hash* h)
 	h->max_size = 0;
 }
 
-// key の値を見てノードを追加する（追加できなかったら false）
+// keyの値を見てノードを追加する(追加できなかったらfalseを返す)
 bool add(hash* h, unsigned int key, const char* value)
 {
 	if (h == NULL) return false;
 	if (h->max_size == ~0) return false;
-	if (key == ~0) return false;
+	if (key == ~0) return NULL;
 
+	// ToDo: ハッシュ関数としてhash_funcを使った
+	// オープンアドレス法によりキーを追加
 	unsigned int idx = get_hash(h, key);
 	if (idx == ~0) return false;
 
 	if (h->nodes[idx].key != ~0) return false;
 
 	h->nodes[idx].key = key;
-	strcpy_s(
-		h->nodes[idx].value,
-		sizeof(h->nodes[idx].value),
-		value
-	);
+	strcpy_s(h->nodes[idx].value, value);
 
 	return true;
 }
 
-// key の値を見てノードを検索し、値を取得する（なければ NULL）
+// keyの値を見てノードを検索して、値を取得する(なければNULLを返す)
 const char* get(const hash* h, unsigned int key)
 {
 	if (key == ~0) return NULL;
 
+	// ToDo: keyから値が格納されている場所を求め、値の場所を返す
 	unsigned int base = hash_func(key, h->max_size);
 
 	for (unsigned int i = 0; i < h->max_size; i++) {
@@ -101,7 +103,7 @@ const char* get(const hash* h, unsigned int key)
 	return NULL;
 }
 
-// ハッシュの値を取得する（デバッグ用）
+// ハッシュの値を取得する(デバッグ用)
 int debug_get_hash(const hash* h, unsigned int key)
 {
 	return get_hash(h, key);
