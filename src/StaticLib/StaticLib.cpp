@@ -1,10 +1,8 @@
 ﻿#define WIN32_LEAN_AND_MEAN             // Windows ヘッダーからほとんど使用されていない部分を除外する
 #include "Windows.h"                    // Windows API の機能定義
 #include <stdlib.h>
-#include <string.h>
 
 #include "../include/lib_func.h"
-
 
 static unsigned int hash_func(unsigned int key, int num)
 {
@@ -18,11 +16,9 @@ static unsigned int get_hash(const hash* h, unsigned int key)
 
 	unsigned int base = hash_func(key, h->max_size);
 
-	// オープンアドレス法（線形探索）
 	for (unsigned int i = 0; i < h->max_size; i++) {
 		unsigned int idx = (base + i) % h->max_size;
 
-		// 未使用、または同じキーが見つかったらそこを返す
 		if (h->nodes[idx].key == ~0 || h->nodes[idx].key == key) {
 			return idx;
 		}
@@ -71,7 +67,6 @@ bool add(hash* h, unsigned int key, const char* value)
 	unsigned int idx = get_hash(h, key);
 	if (idx == ~0) return false;
 
-	// すでに使用中なら追加失敗（上書きしない仕様）
 	if (h->nodes[idx].key != ~0) return false;
 
 	h->nodes[idx].key = key;
@@ -87,7 +82,6 @@ bool add(hash* h, unsigned int key, const char* value)
 // key の値を見てノードを検索し、値を取得する（なければ NULL）
 const char* get(const hash* h, unsigned int key)
 {
-	if (h == NULL) return NULL;
 	if (key == ~0) return NULL;
 
 	unsigned int base = hash_func(key, h->max_size);
@@ -95,7 +89,6 @@ const char* get(const hash* h, unsigned int key)
 	for (unsigned int i = 0; i < h->max_size; i++) {
 		unsigned int idx = (base + i) % h->max_size;
 
-		// 未使用スロットに到達したら探索終了
 		if (h->nodes[idx].key == ~0) {
 			return NULL;
 		}
